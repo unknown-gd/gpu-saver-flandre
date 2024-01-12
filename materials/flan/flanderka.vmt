@@ -1,0 +1,23 @@
+"UnlitGeneric"
+{
+    "nomip"     "1"
+    "nolod"     "1"
+    "ignorez"   "1"
+
+    "$vertexcolor" 1
+    "$vertexalpha" 1
+
+    "$basetexture"          "flan/flanderka"
+    "$basetexturetransform" "center .5 .5 scale 1 1 rotate 0 translate 0 0"
+    "$translucent"          "1"
+
+    "Proxies"
+    {
+        "AnimatedTexture"
+        {
+            "animatedTextureVar"            "$basetexture"
+            "animatedTextureFrameNumVar"    "$frame"
+            "animatedTextureFrameRate"      "4"
+        }
+    }
+}
