@@ -1,10 +1,9 @@
 addonName = "Flandre Stanby Screen"
 :abs, :sin, :min, :ceil = math
 ScrW, ScrH = ScrW, ScrH
-RealTime = RealTime
-:HasFocus = system
 :Add = hook
 
+-- Client-side ConVars
 cl_flandre_color = CreateClientConVar( "cl_flandre_color", "0.15 0.15 0.15", true, false, "Background color of standby screen." )
 cl_flandre_size = CreateClientConVar( "cl_flandre_size", "25", true, false, "Size of standby screen icon.", 1, 100 )
 
@@ -23,36 +22,50 @@ cvars.AddChangeCallback( cl_flandre_color\GetName!, ( _, __, value ) ->
     backgroundColor = Vector( value )\ToColor!
 addonName )
 
+-- I hope it's faster that way... ://
+focusState = false
+
 -- Render
 do
 
     :DrawRect, :DrawTexturedRect, :SetMaterial, :SetDrawColor = surface
+    RealTime = RealTime
+    :HasFocus = system
+
     material = Material( "flan/flanderka", "mips" )
+    x, y, size, shadow1, shadow2, mult = 0, 0, 0, 0, 0, 0
+
+    Add "Think", addonName, ->
+        focusState = HasFocus!
+
+        -- Don't calculate if not in focus
+        unless focusState
+
+            -- Position and size
+            size = ceil( vmin * cl_flandre_size\GetInt! )
+            x, y = ( width - size ) / 2, ( height - size ) / 2
+
+            -- Shadow calculation
+            mult = 0.25 + abs( sin( RealTime! ) ) * 0.25
+            shadow1 = size * 0.1 * mult
+            shadow2 = size * 0.2 * mult
 
     Add "DrawOverlay", addonName, ->
-        if HasFocus!
-            return
+        unless focusState
+            SetDrawColor( backgroundColor.r, backgroundColor.g, backgroundColor.b )
+            DrawRect( 0, 0, width, height )
 
-        SetDrawColor( backgroundColor.r, backgroundColor.g, backgroundColor.b )
-        DrawRect( 0, 0, width, height )
+            SetMaterial( material )
 
-        SetMaterial( material )
+            SetDrawColor( 0, 0, 0, 60 )
+            DrawTexturedRect( x - shadow1, y - shadow1, size, size )
 
-        size = ceil( vmin * cl_flandre_size\GetInt! )
-        x, y = ( width - size ) / 2, ( height - size ) / 2
-        mult = 0.25 + abs( sin( RealTime! ) ) * 0.25
+            SetDrawColor( 0, 0, 0, 120 )
+            DrawTexturedRect( x + shadow2, y + shadow2, size, size )
 
-        shadow1 = size * 0.1
-        SetDrawColor( 0, 0, 0, 60 )
-        DrawTexturedRect( x - shadow1 * mult, y - shadow1 * mult, size, size )
-
-        shadow2 = size * 0.2
-        SetDrawColor( 0, 0, 0, 120 )
-        DrawTexturedRect( x + shadow2 * mult, y + shadow2 * mult, size, size )
-
-        SetDrawColor( 255, 255, 255 )
-        DrawTexturedRect( x, y, size, size )
+            SetDrawColor( 255, 255, 255 )
+            DrawTexturedRect( x, y, size, size )
 
 Add "RenderScene", addonName, ->
-    unless HasFocus!
+    unless focusState
         return true
