@@ -32,7 +32,7 @@ do
     RealTime = RealTime
     :HasFocus = system
 
-    material = Material( "flan/flanderka", "mips" )
+    material = Material( "flan/flanderka" )
     x, y, size, shadow1, shadow2, mult = 0, 0, 0, 0, 0, 0
 
     Add "Think", addonName, ->
