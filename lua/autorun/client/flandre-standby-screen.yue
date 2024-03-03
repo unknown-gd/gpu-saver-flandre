@@ -23,23 +23,24 @@ cvars.AddChangeCallback( cl_flandre_color\GetName!, ( _, __, value ) ->
 addonName )
 
 -- I hope it's faster that way... ://
-focusState = false
+isInFocus, isSinglePlayer = false, game.SinglePlayer!
 
 -- Render
+drawFlandre = nil
 do
 
     :DrawRect, :DrawTexturedRect, :SetMaterial, :SetDrawColor = surface
     RealTime = RealTime
     :HasFocus = system
 
-    material = Material( "flan/flanderka" )
     x, y, size, shadow1, shadow2, mult = 0, 0, 0, 0, 0, 0
+    material = Material( "flan/flanderka" )
 
     Add "Think", addonName, ->
-        focusState = HasFocus!
+        isInFocus = HasFocus!
 
         -- Don't calculate if not in focus
-        unless focusState
+        unless isInFocus
 
             -- Position and size
             size = ceil( vmin * cl_flandre_size\GetInt! )
@@ -50,22 +51,37 @@ do
             shadow1 = size * 0.1 * mult
             shadow2 = size * 0.2 * mult
 
-    Add "DrawOverlay", addonName, ->
-        unless focusState
-            SetDrawColor( backgroundColor.r, backgroundColor.g, backgroundColor.b )
-            DrawRect( 0, 0, width, height )
+    drawFlandre = ->
+        SetDrawColor( backgroundColor.r, backgroundColor.g, backgroundColor.b )
+        DrawRect( 0, 0, width, height )
 
-            SetMaterial( material )
+        SetMaterial( material )
 
-            SetDrawColor( 0, 0, 0, 60 )
-            DrawTexturedRect( x - shadow1, y - shadow1, size, size )
+        SetDrawColor( 0, 0, 0, 60 )
+        DrawTexturedRect( x - shadow1, y - shadow1, size, size )
 
-            SetDrawColor( 0, 0, 0, 120 )
-            DrawTexturedRect( x + shadow2, y + shadow2, size, size )
+        SetDrawColor( 0, 0, 0, 120 )
+        DrawTexturedRect( x + shadow2, y + shadow2, size, size )
 
-            SetDrawColor( 255, 255, 255 )
-            DrawTexturedRect( x, y, size, size )
+        SetDrawColor( 255, 255, 255 )
+        DrawTexturedRect( x, y, size, size )
+
+    unless isSinglePlayer
+        Add "DrawOverlay", addonName, ->
+            if isInFocus
+                return
+
+            drawFlandre!
+
+:Start2D, :End2D = cam
 
 Add "RenderScene", addonName, ->
-    unless focusState
-        return true
+    if isInFocus
+        return
+
+    if isSinglePlayer
+        Start2D!
+        drawFlandre!
+        End2D!
+
+    return true
