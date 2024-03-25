@@ -12,7 +12,7 @@ width, height = ScrW!, ScrH!
 vmin = min( width, height ) / 100
 
 Add "OnScreenSizeChanged", addonName, ->
-    width, height = ScrW!, ScrW!
+    width, height = ScrW!, ScrH!
     vmin = min( width, height ) / 100
 
 -- Background color
