@@ -3,4 +3,4 @@ A fairly simple addon that optimizes the game when it is not active on the syste
 
 ### ConVars:
 - `cl_flandre_bgcolor` ( def. `"33 33 33"` ) - Standby screen background color.
-- `cl_flandre_size` ( def. 25 ) [1-100] - Flandre size in percent.
+- `cl_flandre_size` ( def. `25` ) [1-100] - Flandre size in percent.
