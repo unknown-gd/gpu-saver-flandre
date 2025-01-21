@@ -1,5 +1,11 @@
 local addon_name = "Flandre Stanby Screen"
 
+local enabled = CreateConVar( "cl_flandre_enabled", "1", FCVAR_ARCHIVE, "Enable flandre standby screen." ):GetBool()
+
+cvars.AddChangeCallback( "cl_flandre_enabled", function( _, __, value )
+	enabled = value == "1"
+end, addon_name )
+
 -- Background color
 local red, green, blue = string.match( CreateConVar( "cl_flandre_bgcolor", "33 33 33", FCVAR_ARCHIVE, "Background color of flandre standby screen." ):GetString(), "([%d.]+)%s*([%d.]*)%s*([%d.]*)" )
 red, green, blue = math.Clamp( tonumber( red, 10 ) or 0, 0, 255 ), math.Clamp( tonumber( green, 10 ) or 0, 0, 255 ), math.Clamp( tonumber( blue, 10 ) or 0, 0, 255 )
@@ -34,6 +40,7 @@ local x, y, size, shadow1, shadow2 = 0, 0, 0, 0, 0
 local isInFocus = false
 
 hook.Add( "Think", addon_name, function()
+	if not enabled then return end
 	isInFocus = HasFocus()
 
 	-- Don't calculate if not in focus
@@ -56,7 +63,7 @@ local material = Material( "flan/flanderka" )
 
 -- Render
 hook.Add( "PreRender", addon_name, function()
-	if isInFocus then return end
+	if not enabled or isInFocus then return end
 
 	cam_Start2D()
 
